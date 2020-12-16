@@ -24,7 +24,7 @@ public class CommonValidation {
         return true;
     }
 
-    public boolean isValidNumber(String num) {
+    public boolean isValidPositiveNumber(String num) {
         try {
             long number = Long.parseLong(num);
             return number >= 0;
@@ -39,8 +39,6 @@ public class CommonValidation {
             LocalDate fromDate = CommonUtilities.convertStringToLocaldate(from);
             LocalDate toDate = CommonUtilities.convertStringToLocaldate(to);
 
-            assert fromDate != null;
-            assert toDate != null;
             return fromDate.isBefore(toDate) || fromDate.isEqual(toDate);
         } else
             return false;

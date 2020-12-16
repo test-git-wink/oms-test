@@ -69,8 +69,8 @@ class OrderControllerTest {
 
         Mockito.when(orderService.getOrders(fromDate1, toDate1, Integer.parseInt(page1), Integer.parseInt(pageLimit))).thenReturn(orderDataList1);
         Mockito.when(commonValidation.isVallidDateRange(fromDate1, toDate1)).thenReturn(true);
-        Mockito.when(commonValidation.isValidNumber(page1)).thenReturn(true);
-        Mockito.when(commonValidation.isValidNumber(pageLimit)).thenReturn(true);
+        Mockito.when(commonValidation.isValidPositiveNumber(page1)).thenReturn(true);
+        Mockito.when(commonValidation.isValidPositiveNumber(pageLimit)).thenReturn(true);
 
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         formatter.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
@@ -99,8 +99,26 @@ class OrderControllerTest {
         String pageLimit = "1h";
 
         Mockito.when(commonValidation.isVallidDateRange(fromDate1, toDate1)).thenReturn(false);
-        Mockito.when(commonValidation.isValidNumber(page1)).thenReturn(false);
-        Mockito.when(commonValidation.isValidNumber(pageLimit)).thenReturn(false);
+        Mockito.when(commonValidation.isValidPositiveNumber(page1)).thenReturn(false);
+        Mockito.when(commonValidation.isValidPositiveNumber(pageLimit)).thenReturn(false);
+
+        mockMvc.perform(get("/v1/customer-orders/order/")
+                .param("fromDate", fromDate1).param("toDate", toDate1).param("page", page1).param("limit", pageLimit))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(INVALID_INPUTS))
+                .andExpect(jsonPath("$.message").value("Invalid date range or page number"));
+    }
+
+    @Test
+    void getOrdersTestBadRequest2() throws Exception {
+        String fromDate1 = "2020-13-13";
+        String toDate1 = "2020-12-34";
+        String page1 = "1fg";
+        String pageLimit = "1h";
+
+        Mockito.when(commonValidation.isVallidDateRange(fromDate1, toDate1)).thenReturn(true);
+        Mockito.when(commonValidation.isValidPositiveNumber(page1)).thenReturn(true);
+        Mockito.when(commonValidation.isValidPositiveNumber(pageLimit)).thenReturn(false);
 
         mockMvc.perform(get("/v1/customer-orders/order/")
                 .param("fromDate", fromDate1).param("toDate", toDate1).param("page", page1).param("limit", pageLimit))
@@ -117,8 +135,8 @@ class OrderControllerTest {
         String pageLimit = "11";
 
         Mockito.when(commonValidation.isVallidDateRange(fromDate1, toDate1)).thenReturn(true);
-        Mockito.when(commonValidation.isValidNumber(page1)).thenReturn(true);
-        Mockito.when(commonValidation.isValidNumber(pageLimit)).thenReturn(true);
+        Mockito.when(commonValidation.isValidPositiveNumber(page1)).thenReturn(true);
+        Mockito.when(commonValidation.isValidPositiveNumber(pageLimit)).thenReturn(true);
 
         Mockito.doThrow(new DataAccessException("") {
         }).when(orderService).getOrders(Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt());
@@ -140,7 +158,7 @@ class OrderControllerTest {
 
         Mockito.when(orderService.cancelOrder(orderId, orderUpdateRequest)).thenReturn(1);
         Mockito.when(orderValidation.isValidOrder(orderId)).thenReturn(true);
-        Mockito.when(commonValidation.isValidNumber(orderIdString)).thenReturn(true);
+        Mockito.when(commonValidation.isValidPositiveNumber(orderIdString)).thenReturn(true);
 
         mockMvc.perform(patch("/v1/customer-orders/order/{orderId}", orderId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -176,7 +194,7 @@ class OrderControllerTest {
         Mockito.when(orderService.cancelOrder(anyLong(), any(OrderUpdateRequest.class))).thenThrow(new DataAccessException("") {
         });
 
-        Mockito.when(commonValidation.isValidNumber(orderIdString)).thenReturn(true);
+        Mockito.when(commonValidation.isValidPositiveNumber(orderIdString)).thenReturn(true);
         Mockito.when(orderValidation.isValidOrder(orderId)).thenReturn(true);
 
         mockMvc.perform(patch("/v1/customer-orders/order/{orderId}", orderId)

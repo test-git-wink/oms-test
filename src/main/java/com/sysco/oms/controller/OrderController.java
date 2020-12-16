@@ -87,8 +87,8 @@ class OrderController {
 
         try {
             LOGGER.info("OrderController getOrders() parameters [fromDate:{} ,toDate: {} ,page: {}]", fromDate, toDate, page);
-            if (commonValidation.isVallidDateRange(fromDate, toDate) && commonValidation.isValidNumber(page)
-                    && commonValidation.isValidNumber(pageLimit)) {
+            if (commonValidation.isVallidDateRange(fromDate, toDate) && commonValidation.isValidPositiveNumber(page)
+                    && commonValidation.isValidPositiveNumber(pageLimit)) {
 
                 List<OrderData> orders = orderService.getOrders(fromDate, toDate
                         , Integer.parseInt(page), Integer.parseInt(pageLimit));
@@ -117,7 +117,7 @@ class OrderController {
             , @RequestBody OrderUpdateRequest orderUpdateRequest) {
         try {
             LOGGER.info("OrderController updateOrder() parameters [orderId:{} ,orderUpdateRequest: {} ]", orderId, orderUpdateRequest);
-            if (commonValidation.isValidNumber(orderId) && orderValidation.isValidOrder(Long.parseLong(orderId))) {
+            if (commonValidation.isValidPositiveNumber(orderId) && orderValidation.isValidOrder(Long.parseLong(orderId))) {
                 orderService.cancelOrder(Long.parseLong(orderId), orderUpdateRequest);
                 return ResponseEntity.status(HttpStatus.NO_CONTENT)
                         .body(new StatusResponse(SUCCESS, "Successful"));

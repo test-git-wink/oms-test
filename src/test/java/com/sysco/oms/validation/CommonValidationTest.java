@@ -1,6 +1,5 @@
 package com.sysco.oms.validation;
 
-import com.sysco.oms.validation.CommonValidation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -18,9 +17,11 @@ class CommonValidationTest {
 
     @Test
     void isValidNumberTest() {
-        Assertions.assertTrue(commonValidation.isValidNumber("2020"));
-        Assertions.assertFalse(commonValidation.isValidNumber("2020.3"));
-        Assertions.assertFalse(commonValidation.isValidNumber("Hi"));
+        Assertions.assertTrue(commonValidation.isValidPositiveNumber("2020"));
+        Assertions.assertFalse(commonValidation.isValidPositiveNumber("2020.3"));
+        Assertions.assertFalse(commonValidation.isValidPositiveNumber("Hi"));
+        Assertions.assertTrue(commonValidation.isValidPositiveNumber("0"));
+        Assertions.assertFalse(commonValidation.isValidPositiveNumber("-3"));
     }
 
     @Test
@@ -31,6 +32,12 @@ class CommonValidationTest {
         Assertions.assertFalse(commonValidation.isVallidDateRange("2020-12-01","2019-01-31"));
         Assertions.assertFalse(commonValidation.isVallidDateRange("2020-13-01","2020-14-31"));
         Assertions.assertFalse(commonValidation.isVallidDateRange("Hi","234asd"));
+        Assertions.assertFalse(commonValidation.isVallidDateRange("Hi","2020-13-01"));
+        Assertions.assertFalse(commonValidation.isVallidDateRange("2020-14-31","234asd"));
+        Assertions.assertFalse(commonValidation.isVallidDateRange("2020-14-31",null));
+        Assertions.assertFalse(commonValidation.isVallidDateRange(null,"234asd"));
+        Assertions.assertFalse(commonValidation.isVallidDateRange("2020-14-31",null));
+        Assertions.assertFalse(commonValidation.isVallidDateRange(null,"2020-14-31"));
         Assertions.assertFalse(commonValidation.isVallidDateRange(null,null));
     }
 }
