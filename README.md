@@ -3,6 +3,7 @@
 ### Requirements
 ```
 openjdk 15
+maven 3 or above
 ```
 ### Setup
 ```
