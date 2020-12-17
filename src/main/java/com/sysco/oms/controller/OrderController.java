@@ -53,17 +53,23 @@ class OrderController {
         Long orderId;
         try {
             LOGGER.info("OrderController createOrder() parameters : [OrderRequest={} ]", orderRequest);
+
             if (orderValidation.isValidOrderRequest(orderRequest)) {
+
                 orderId = orderService.placeOrder(orderRequest);
+
                     return ResponseEntity.status(HttpStatus.CREATED)
                             .body(new PostOrderResponse(orderId, StatusConst.OrderStatus.placed.toString(),"Order placed"));
 
             }
             else
+
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(new PostOrderResponse(StatusConst.OrderStatus.fail.toString(), "Invalid order request"));
+
         } catch (Exception e) {
             LOGGER.error("OrderController createOrder() responseStatus: {} ", SERVER_ERROR);
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new PostOrderResponse(StatusConst.OrderStatus.fail.toString(), INTERNAL_SERVER_ERROR));
         }
@@ -87,6 +93,7 @@ class OrderController {
 
         try {
             LOGGER.info("OrderController getOrders() parameters [fromDate:{} ,toDate: {} ,page: {}]", fromDate, toDate, page);
+
             if (commonValidation.isVallidDateRange(fromDate, toDate) && commonValidation.isValidPositiveNumber(page)
                     && commonValidation.isValidPositiveNumber(pageLimit)) {
 
@@ -95,11 +102,13 @@ class OrderController {
                 return ResponseEntity.status(HttpStatus.OK).body(new GetOrdersResponse(orders, SUCCESS, "Successful"));
 
             } else {
+
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(new GetOrdersResponse(INVALID_INPUTS, "Invalid date range or page number"));
             }
         } catch (Exception e) {
             LOGGER.error("OrderController getOrders() responseStatus: {} ", SERVER_ERROR);
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new GetOrdersResponse(SERVER_ERROR, INTERNAL_SERVER_ERROR));
         }

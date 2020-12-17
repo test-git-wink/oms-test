@@ -58,7 +58,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Long placeOrder(OrderRequest orderRequest) {
 
-
         double orderTotalPrice = 0;
         List<OrderItem> orderItemsPersist = new ArrayList<>();
         List<ProdQuantity> getOrderingProducts = orderValidation.validOrderItemList(orderRequest.getOrderItemList());
@@ -70,6 +69,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         Integer deliveryId = addDelivery(orderUtilites.getDeliveryDate(), orderRequest.getUserAddresID(), "pending");
+
         Long orderId = orderCustomRepo.insertOrder(orderRequest, deliveryId, CommonUtilities.getInvoiceId()
                 , CommonUtilities.getCurrentTimeStamp(), orderTotalPrice);
 
@@ -90,8 +90,11 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderData> getOrders(String fromDate, String toDate, Integer page, Integer limit) {
 
         LOGGER.info("OrderServiceImpl getOrders() {params: fromDate={},toDate={}", fromDate, toDate);
+
         Map<String, Date> orderSearchDate = orderUtilites.getOrderSearchDateRangeDate(fromDate, toDate);
+
         Pageable pageable = PageRequest.of(page, limit);
+
         return
                 orderRepo.findOrderDataByDateRange(orderSearchDate.get("fromDate")
                         , orderSearchDate.get("toDate"), pageable).getContent().stream().map(it -> new OrderData(it.getOrderId()
@@ -106,11 +109,15 @@ public class OrderServiceImpl implements OrderService {
     public Integer cancelOrder(Long orderId, OrderUpdateRequest orderUpdateRequest) {
 
         LOGGER.info("OrderServiceImpl cancelOrder() {params: orderId={},orderUpdateRequest={}", orderId, orderUpdateRequest);
+
         String status = orderRepo.findOrderStatusById(orderId);
+
         if (orderValidation.isValidUpdateStatus(orderUpdateRequest) &&
                 !status.equals(OrderStatus.fail.toString()) && !status.equals(OrderStatus.cancel.toString())
                 && orderUpdateRequest.getOrderStatus().equals(OrderStatus.cancel.toString())) {
+
             return orderRepo.updateOrderStatus(orderId, OrderStatus.cancel.toString());
+
         } else
             return 0;
     }
