@@ -13,9 +13,18 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The type Custom rest exception handler.
+ */
 @ControllerAdvice
 public class CustomRestExceptionHandler  extends ResponseEntityExceptionHandler {
 
+    /**
+     * Build response entity.
+     *
+     * @param apiError the api error
+     * @return the response entity
+     */
     public ResponseEntity<Object> build(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
     }

@@ -27,6 +27,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 
+/**
+ * The type Order service.
+ */
 @Service
 public class OrderServiceImpl implements OrderService {
 
