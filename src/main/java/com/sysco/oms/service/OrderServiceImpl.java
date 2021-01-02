@@ -87,13 +87,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderData> getOrders(String fromDate, String toDate, Integer page, Integer limit) {
+    public List<OrderData> getOrders(String fromDate, String toDate, String page, String limit) {
 
         LOGGER.info("OrderServiceImpl getOrders() {params: fromDate={},toDate={}", fromDate, toDate);
 
         Map<String, Date> orderSearchDate = orderUtilites.getOrderSearchDateRangeDate(fromDate, toDate);
 
-        Pageable pageable = PageRequest.of(page, limit);
+        Pageable pageable = PageRequest.of(Integer.parseInt(page),Integer.parseInt(limit));
 
         return
                 orderRepo.findOrderDataByDateRange(orderSearchDate.get("fromDate")
@@ -110,11 +110,7 @@ public class OrderServiceImpl implements OrderService {
 
         LOGGER.info("OrderServiceImpl cancelOrder() {params: orderId={},orderUpdateRequest={}", orderId, orderUpdateRequest);
 
-        String status = orderRepo.findOrderStatusById(orderId);
-
-        if (orderValidation.isValidUpdateStatus(orderUpdateRequest) &&
-                !status.equals(OrderStatus.fail.toString()) && !status.equals(OrderStatus.cancel.toString())
-                && orderUpdateRequest.getOrderStatus().equals(OrderStatus.cancel.toString())) {
+        if (orderValidation.isValidOrderCancelRequest(orderId,orderUpdateRequest)) {
 
             return orderRepo.updateOrderStatus(orderId, OrderStatus.cancel.toString());
 

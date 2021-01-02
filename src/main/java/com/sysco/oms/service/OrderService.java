@@ -29,7 +29,7 @@ public interface OrderService {
      * @param limit    the limit
      * @return the orders
      */
-    List<OrderData> getOrders(String fromDate, String toDate, Integer page,Integer limit);
+    List<OrderData> getOrders(String fromDate, String toDate, String page,String limit);
 
     /**
      * Cancel order integer.

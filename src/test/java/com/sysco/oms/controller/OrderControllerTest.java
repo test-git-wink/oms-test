@@ -67,10 +67,10 @@ class OrderControllerTest {
         List<OrderData> orderDataList1 = Stream.of(new OrderData(1000L, 10L, 1000.0, new Date(), "approved", LocalDate.of(2020, 12, 14), "pending", "45,Abc Rd,SL")
                 , new OrderData(1001L, 11L, 1000.0, new Date(), "approved", LocalDate.of(2020, 12, 14), "pending", "45,Abc Rd,SL")).collect(Collectors.toList());
 
-        Mockito.when(orderService.getOrders(fromDate1, toDate1, Integer.parseInt(page1), Integer.parseInt(pageLimit))).thenReturn(orderDataList1);
-        Mockito.when(commonValidation.isVallidDateRange(fromDate1, toDate1)).thenReturn(true);
-        Mockito.when(commonValidation.isValidPositiveNumber(page1)).thenReturn(true);
-        Mockito.when(commonValidation.isValidPositiveNumber(pageLimit)).thenReturn(true);
+        Mockito.when(orderService.getOrders(fromDate1, toDate1, page1, pageLimit)).thenReturn(orderDataList1);
+        Mockito.when(orderValidation.isValidGetOrderRequest(fromDate1, toDate1,page1,pageLimit)).thenReturn(true);
+//        Mockito.when(commonValidation.isValidPositiveNumber(page1)).thenReturn(true);
+//        Mockito.when(commonValidation.isValidPositiveNumber(pageLimit)).thenReturn(true);
 
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         formatter.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
@@ -98,9 +98,9 @@ class OrderControllerTest {
         String page1 = "1fg";
         String pageLimit = "1h";
 
-        Mockito.when(commonValidation.isVallidDateRange(fromDate1, toDate1)).thenReturn(false);
-        Mockito.when(commonValidation.isValidPositiveNumber(page1)).thenReturn(false);
-        Mockito.when(commonValidation.isValidPositiveNumber(pageLimit)).thenReturn(false);
+        Mockito.when(orderValidation.isValidGetOrderRequest(fromDate1, toDate1,page1,pageLimit)).thenReturn(false);
+//        Mockito.when(commonValidation.isValidPositiveNumber(page1)).thenReturn(false);
+//        Mockito.when(commonValidation.isValidPositiveNumber(pageLimit)).thenReturn(false);
 
         mockMvc.perform(get("/v1/customer-orders/order/")
                 .param("fromDate", fromDate1).param("toDate", toDate1).param("page", page1).param("limit", pageLimit))
@@ -134,12 +134,13 @@ class OrderControllerTest {
         String page1 = "1";
         String pageLimit = "11";
 
-        Mockito.when(commonValidation.isVallidDateRange(fromDate1, toDate1)).thenReturn(true);
-        Mockito.when(commonValidation.isValidPositiveNumber(page1)).thenReturn(true);
-        Mockito.when(commonValidation.isValidPositiveNumber(pageLimit)).thenReturn(true);
+        Mockito.when(orderValidation.isValidGetOrderRequest(fromDate1, toDate1,page1,pageLimit)).thenReturn(true);
+//        Mockito.when(commonValidation.isVallidDateRange(fromDate1, toDate1)).thenReturn(true);
+//        Mockito.when(commonValidation.isValidPositiveNumber(page1)).thenReturn(true);
+//        Mockito.when(commonValidation.isValidPositiveNumber(pageLimit)).thenReturn(true);
 
         Mockito.doThrow(new DataAccessException("") {
-        }).when(orderService).getOrders(Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt());
+        }).when(orderService).getOrders(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 
         mockMvc.perform(get("/v1/customer-orders/order/")
                 .param("fromDate", fromDate1).param("toDate", toDate1).param("page", page1).param("limit", pageLimit))
@@ -157,8 +158,8 @@ class OrderControllerTest {
         OrderUpdateRequest orderUpdateRequest = new OrderUpdateRequest("cancel");
 
         Mockito.when(orderService.cancelOrder(orderId, orderUpdateRequest)).thenReturn(1);
-        Mockito.when(orderValidation.isValidOrder(orderId)).thenReturn(true);
-        Mockito.when(commonValidation.isValidPositiveNumber(orderIdString)).thenReturn(true);
+        Mockito.when(orderValidation.isValidPatchOrderRequest(orderIdString)).thenReturn(true);
+//        Mockito.when(commonValidation.isValidPositiveNumber(orderIdString)).thenReturn(true);
 
         mockMvc.perform(patch("/v1/customer-orders/order/{orderId}", orderId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -171,9 +172,10 @@ class OrderControllerTest {
     @Test
     void updateOrderTestBadRequest() throws Exception {
         Long orderId = 1001L;
+        String orderIdString = "1000";
         OrderUpdateRequest orderUpdateRequest = new OrderUpdateRequest("fail");
 
-        Mockito.when(orderValidation.isValidOrder(orderId)).thenReturn(false);
+        Mockito.when(orderValidation.isValidPatchOrderRequest(orderIdString)).thenReturn(false);
         Mockito.when(orderService.cancelOrder(orderId, orderUpdateRequest)).thenReturn(0);
 
         mockMvc.perform(patch("/v1/customer-orders/order/{orderId}", orderId)
@@ -194,8 +196,8 @@ class OrderControllerTest {
         Mockito.when(orderService.cancelOrder(anyLong(), any(OrderUpdateRequest.class))).thenThrow(new DataAccessException("") {
         });
 
-        Mockito.when(commonValidation.isValidPositiveNumber(orderIdString)).thenReturn(true);
-        Mockito.when(orderValidation.isValidOrder(orderId)).thenReturn(true);
+//        Mockito.when(commonValidation.isValidPositiveNumber(orderIdString)).thenReturn(true);
+        Mockito.when(orderValidation.isValidPatchOrderRequest(orderIdString)).thenReturn(true);
 
         mockMvc.perform(patch("/v1/customer-orders/order/{orderId}", orderId)
                 .contentType(MediaType.APPLICATION_JSON)

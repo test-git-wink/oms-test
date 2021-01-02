@@ -149,7 +149,7 @@ class OrderServiceImplTest {
 
 //        when(orderRepo.findOrderDataByDateRange(formatterWithTime.parse("2020-12-01 00:00:00"), formatterWithTime.parse("2020-11-01 00:00:00"), PageRequest.of(1,2))).thenThrow(new DataAccessException("..."){ });
 
-        Assertions.assertEquals(orderData1, orderService.getOrders(from1, to1, 1, 2));
+        Assertions.assertEquals(orderData1, orderService.getOrders(from1, to1, "1", "2"));
 //        Assertions.assertEquals(new ArrayList<>(), orderService.getOrders("2020-12-01", "2020-10-31", 1, 2));
     }
 
@@ -176,12 +176,12 @@ class OrderServiceImplTest {
         when(orderRepo.findOrderStatusById(orderId5)).thenReturn("fail");
         when(orderRepo.findOrderStatusById(orderId6)).thenReturn("cancel");
 
-        when(orderValidation.isValidUpdateStatus(orderUpdateRequest1)).thenReturn(true);
-        when(orderValidation.isValidUpdateStatus(orderUpdateRequest2)).thenReturn(false);
-        when(orderValidation.isValidUpdateStatus(orderUpdateRequest3)).thenReturn(false);
-        when(orderValidation.isValidUpdateStatus(orderUpdateRequest4)).thenReturn(false);
-        when(orderValidation.isValidUpdateStatus(orderUpdateRequest5)).thenReturn(true);
-        when(orderValidation.isValidUpdateStatus(orderUpdateRequest6)).thenReturn(true);
+        when(orderValidation.isValidOrderCancelRequest(orderId1,orderUpdateRequest1)).thenReturn(true);
+        when(orderValidation.isValidOrderCancelRequest(orderId2,orderUpdateRequest2)).thenReturn(false);
+        when(orderValidation.isValidOrderCancelRequest(orderId3,orderUpdateRequest3)).thenReturn(false);
+        when(orderValidation.isValidOrderCancelRequest(orderId4,orderUpdateRequest4)).thenReturn(false);
+        when(orderValidation.isValidOrderCancelRequest(orderId5,orderUpdateRequest5)).thenReturn(true);
+        when(orderValidation.isValidOrderCancelRequest(orderId6,orderUpdateRequest6)).thenReturn(true);
 
         when(orderRepo.updateOrderStatus(orderId1, StatusConst.OrderStatus.cancel.toString())).thenReturn(1);
 

@@ -27,6 +27,8 @@ public class OrderValidation {
     private UserAddressRepo userAddressRepo;
     @Autowired
     private ProductsRepo productsRepo;
+    @Autowired
+    private CommonValidation commonValidation;
 
 
     public boolean isValidOrder(Long orderId) {
@@ -54,12 +56,12 @@ public class OrderValidation {
         return false;
     }
 
-    public List<ProdQuantity> validOrderItemList(List<ProdQuantity> itemList){
-        List<ProdQuantity> orderingProducts=new ArrayList<>();
-        for (ProdQuantity prodQuantity: itemList) {
-            Optional<Product> product=productsRepo.findById(prodQuantity.getProductId());
+    public List<ProdQuantity> validOrderItemList(List<ProdQuantity> itemList) {
+        List<ProdQuantity> orderingProducts = new ArrayList<>();
+        for (ProdQuantity prodQuantity : itemList) {
+            Optional<Product> product = productsRepo.findById(prodQuantity.getProductId());
 
-            if (product.isPresent() && product.get().getInStockQuantiy() > prodQuantity.getQuantity()){
+            if (product.isPresent() && product.get().getInStockQuantiy() > prodQuantity.getQuantity()) {
                 orderingProducts.add(prodQuantity);
             }
         }
@@ -68,10 +70,27 @@ public class OrderValidation {
 
     public boolean isValidOrderRequest(OrderRequest orderRequest) {
         boolean validUserAddress = isValidUserAddress(orderRequest.getUserAddresID(), orderRequest.getUserId());
-        boolean validOrderStatus=isValidOrderRequestStatus(orderRequest.getOrderStatus());
-        int orderingProducts=validOrderItemList(orderRequest.getOrderItemList()).size();
+        boolean validOrderStatus = isValidOrderRequestStatus(orderRequest.getOrderStatus());
+        int orderingProducts = validOrderItemList(orderRequest.getOrderItemList()).size();
 
-        return validUserAddress && validOrderStatus && orderingProducts>0;
+        return validUserAddress && validOrderStatus && orderingProducts > 0;
+    }
+
+    public boolean isValidGetOrderRequest(String fromDate, String toDate, String page, String limit) {
+        return commonValidation.isVallidDateRange(fromDate, toDate)
+                && commonValidation.isValidPositiveNumber(page) && commonValidation.isValidPositiveNumber(limit);
+    }
+
+    public boolean isValidPatchOrderRequest(String orderId) {
+        return commonValidation.isValidPositiveNumber(orderId) && isValidOrder(Long.parseLong(orderId));
+    }
+
+    public boolean isValidOrderCancelRequest(Long orderId,OrderUpdateRequest orderUpdateRequest) {
+        String status = orderRepo.findOrderStatusById(orderId);
+
+        return isValidUpdateStatus(orderUpdateRequest) &&
+                !status.equals(StatusConst.OrderStatus.fail.toString()) && !status.equals(StatusConst.OrderStatus.cancel.toString())
+                && orderUpdateRequest.getOrderStatus().equals(StatusConst.OrderStatus.cancel.toString());
     }
 
 }

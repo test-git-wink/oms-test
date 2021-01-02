@@ -17,4 +17,4 @@ spring:
       batch_versioned_data: true
 
 server:
-  port: 8081
+  port: 8082

@@ -48,7 +48,7 @@ class OrderController {
      *
      * @param orderRequest the order request
      */
-    @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE,produces =MediaType.APPLICATION_JSON_VALUE )
+    @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PostOrderResponse> createOrder(@RequestBody OrderRequest orderRequest) {
         Long orderId;
         try {
@@ -58,11 +58,10 @@ class OrderController {
 
                 orderId = orderService.placeOrder(orderRequest);
 
-                    return ResponseEntity.status(HttpStatus.CREATED)
-                            .body(new PostOrderResponse(orderId, StatusConst.OrderStatus.placed.toString(),"Order placed"));
+                return ResponseEntity.status(HttpStatus.CREATED)
+                        .body(new PostOrderResponse(orderId, StatusConst.OrderStatus.placed.toString(), "Order placed"));
 
-            }
-            else
+            } else
 
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(new PostOrderResponse(StatusConst.OrderStatus.fail.toString(), "Invalid order request"));
@@ -78,13 +77,13 @@ class OrderController {
     /**
      * Gets orders.
      *
-     * @param fromDate the from date
-     * @param toDate   the to date
-     * @param page     the page
-     * @param pageLimit    the limit
+     * @param fromDate  the from date
+     * @param toDate    the to date
+     * @param page      the page
+     * @param pageLimit the limit
      * @return the orders
      */
-    @GetMapping(value = "/",produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetOrdersResponse> getOrders(
             @RequestParam(value = "fromDate") String fromDate,
             @RequestParam(value = "toDate") String toDate,
@@ -94,11 +93,10 @@ class OrderController {
         try {
             LOGGER.info("OrderController getOrders() parameters [fromDate:{} ,toDate: {} ,page: {}]", fromDate, toDate, page);
 
-            if (commonValidation.isVallidDateRange(fromDate, toDate) && commonValidation.isValidPositiveNumber(page)
-                    && commonValidation.isValidPositiveNumber(pageLimit)) {
+            if (orderValidation.isValidGetOrderRequest(fromDate, toDate, page, pageLimit)) {
 
                 List<OrderData> orders = orderService.getOrders(fromDate, toDate
-                        , Integer.parseInt(page), Integer.parseInt(pageLimit));
+                        , page, pageLimit);
                 return ResponseEntity.status(HttpStatus.OK).body(new GetOrdersResponse(orders, SUCCESS, "Successful"));
 
             } else {
@@ -126,7 +124,7 @@ class OrderController {
             , @RequestBody OrderUpdateRequest orderUpdateRequest) {
         try {
             LOGGER.info("OrderController updateOrder() parameters [orderId:{} ,orderUpdateRequest: {} ]", orderId, orderUpdateRequest);
-            if (commonValidation.isValidPositiveNumber(orderId) && orderValidation.isValidOrder(Long.parseLong(orderId))) {
+            if (orderValidation.isValidPatchOrderRequest(orderId)) {
                 orderService.cancelOrder(Long.parseLong(orderId), orderUpdateRequest);
                 return ResponseEntity.status(HttpStatus.NO_CONTENT)
                         .body(new StatusResponse(SUCCESS, "Successful"));
@@ -136,7 +134,7 @@ class OrderController {
             }
 
         } catch (Exception e) {
-            LOGGER.error("OrderController updateOrder() responseStatus: {} error {}", SERVER_ERROR,e);
+            LOGGER.error("OrderController updateOrder() responseStatus: {} error {}", SERVER_ERROR, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new StatusResponse(SERVER_ERROR, INTERNAL_SERVER_ERROR));
         }
