@@ -13,6 +13,7 @@ import com.sysco.oms.validation.OrderValidation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ import static com.sysco.oms.constants.ResponseStatus.*;
 /**
  * The type Order controller.
  */
-@CrossOrigin(origins = "http://localhost:8081/v1")
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping(value = "/v1/customer-orders/order")
 class OrderController {
@@ -48,7 +49,7 @@ class OrderController {
      *
      * @param orderRequest the order request
      */
-    @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PostOrderResponse> createOrder(@RequestBody OrderRequest orderRequest) {
         Long orderId;
         try {
@@ -83,7 +84,7 @@ class OrderController {
      * @param pageLimit the limit
      * @return the orders
      */
-    @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GetOrdersResponse> getOrders(
             @RequestParam(value = "fromDate") String fromDate,
             @RequestParam(value = "toDate") String toDate,
@@ -97,7 +98,9 @@ class OrderController {
 
                 List<OrderData> orders = orderService.getOrders(fromDate, toDate
                         , page, pageLimit);
-                return ResponseEntity.status(HttpStatus.OK).body(new GetOrdersResponse(orders, SUCCESS, "Successful"));
+
+                Long orderCount= orderService.getOrdersCount(fromDate,toDate);
+                return ResponseEntity.status(HttpStatus.OK).body(new GetOrdersResponse(orders, SUCCESS, "Successful",orderCount));
 
             } else {
 
@@ -126,7 +129,9 @@ class OrderController {
             LOGGER.info("OrderController updateOrder() parameters [orderId:{} ,orderUpdateRequest: {} ]", orderId, orderUpdateRequest);
             if (orderValidation.isValidPatchOrderRequest(orderId)) {
                 orderService.cancelOrder(Long.parseLong(orderId), orderUpdateRequest);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT)
+               HttpHeaders httpHeaders= new HttpHeaders();
+               httpHeaders.add(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS,"POST, PUT, GET, OPTIONS, DELETE,PATCH,HEAD");
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).headers(httpHeaders)
                         .body(new StatusResponse(SUCCESS, "Successful"));
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)

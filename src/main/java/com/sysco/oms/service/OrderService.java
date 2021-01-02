@@ -49,4 +49,7 @@ public interface OrderService {
      * @return the integer
      */
     Integer addDelivery(LocalDate deliveryDate, Integer userAddressId, String deliveryStatus);
+
+
+    Long getOrdersCount(String fromDate, String toDate);
 }

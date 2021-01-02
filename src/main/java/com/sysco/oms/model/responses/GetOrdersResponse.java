@@ -23,6 +23,8 @@ public class GetOrdersResponse {
 
     private String message;
 
+    private Long orderCount;
+
     /**
      * Instantiates a new Get orders response.
      *

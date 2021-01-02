@@ -19,7 +19,7 @@ import java.util.Date;
 public class OrderData {
 
 
-    private Long orderId;
+    private Long id;
 
     private Long customerId;
 

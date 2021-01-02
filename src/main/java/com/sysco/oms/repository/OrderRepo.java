@@ -26,6 +26,11 @@ public interface OrderRepo extends JpaRepository<Order,Long> {
             " where o.orderTimestamp >=?1 and o.orderTimestamp < ?2 ")
     Page<Order> findOrderDataByDateRange(Date fromDate, Date toDate, Pageable page);
 
+    @Query(value = "SELECT count(o)" +
+            " FROM Order o "+
+            " where o.orderTimestamp >=?1 and o.orderTimestamp < ?2 ")
+    Long countOrderDataByDateRange(Date fromDate, Date toDate);
+
     @Transactional
     @Modifying
     @Query(value = "Update orders  set order_status = ?2 where order_id = ?1 ",nativeQuery = true)

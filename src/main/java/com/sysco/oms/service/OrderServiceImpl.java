@@ -123,4 +123,12 @@ public class OrderServiceImpl implements OrderService {
 
         return deliveryCustomRepo.insertDelivery(deliveryDate, userAddressId, deliveryStatus);
     }
+
+    @Override
+    public Long getOrdersCount(String fromDate, String toDate) {
+        Map<String, Date> orderSearchDate = orderUtilites.getOrderSearchDateRangeDate(fromDate, toDate);
+
+        return orderRepo.countOrderDataByDateRange(orderSearchDate.get("fromDate")
+                , orderSearchDate.get("toDate"));
+    }
 }
